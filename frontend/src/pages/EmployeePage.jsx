@@ -11,7 +11,7 @@ import EmployeeUpdate from '../components/employee/EmployeeUpdate'
 import{//<------------------여기서 새로 import
   useDeleteEmployee
   
-}from "../no3_store/hooks/useEmployee"
+}from "../store/hooks/useEmployee"
 
 const EmployeePage = () => {
   const [selectedId,setSelectedId] = useState("");//<----잠시 임시방편?
