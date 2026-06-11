@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  # 1. 프론트엔드 Nginx 웹 서버
+  frontend-web:
+    container_name: frontend-nginx
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    volumes:
+      # 젠킨스가 빌드한 최신 dist 파일들을 Nginx 컨테이너 내부로 실시간 동기화
+      - ./frontend/dist:/usr/share/nginx/html
+    restart: unless-stopped
+    networks:
+      - app-network
+    depends_on:
+      - json-server # 💡 백엔드가 먼저 켜진 후 프론트엔드가 켜지도록 이성적 제어 구멍 확보
+
+  # 2. 가짜 백엔드 데이터 서버 (JSON Server 추가 ✨)
+  json-server:
+    container_name: mock-backend
+    image: node:20-alpine # 무거운 이미지 대신 가벼운 노드 리눅스 채택
+    working_dir: /data
+    ports:
+      - "3001:3001" # 외부(호스트 컴퓨터 브라우저)에서도 3001포트로 확인 가능하게 매핑
+    volumes:
+      # 💡 중요: 루트에 있는 db.json 파일을 컨테이너 내부로 마운트
+      - ./db.json:/data/db.json
+    # 컨테이너 켜지자마자 json-server 글로벌 설치하고 3001 포트로 대기타게 만드는 알고리즘
+    command: sh -c "npm install -g json-server@0.17.4 && json-server --watch db.json --port 3001 --host 0.0.0.0"
+    restart: unless-stopped
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
