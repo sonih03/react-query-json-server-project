@@ -5,7 +5,7 @@ const initialEmp = {
    name: '', email: '', job: '', pay:''
 }
 
-import { usePostRegisterEmployee } from "../../no3_store/hooks/useEmployee";
+import { usePostRegisterEmployee } from "../../store/hooks/useEmployee";
 
 const EmployeeRegister = () => {
     const [emp, setEmp] = useState(initialEmp);

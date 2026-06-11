@@ -5,7 +5,7 @@ import styled from 'styled-components'
 
 import{//<------------------여기서 새로 import
   useAllGetEmployee
-} from "../../no3_store/hooks/useEmployee"
+} from "../../store/hooks/useEmployee"
 
 const EmployeeList = ({selectedId, setSelectedId}) => {
     // const {empTable,selectedId} = useSelector(state=>state.emp);//<-----------------------여기부터 주석처리
