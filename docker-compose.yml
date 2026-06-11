@@ -1,38 +1,27 @@
-version: '3.8'
-
 services:
-  # 1. 프론트엔드 Nginx 웹 서버
-  frontend-web:
-    container_name: frontend-nginx
+
+  json-server:
     build:
-      context: ./nginx
-      dockerfile: Dockerfile
+      context: ./frontend/server
+
+    container_name: json-server
+
     ports:
-      - "80:80"
-    volumes:
-      # 젠킨스가 빌드한 최신 dist 파일들을 Nginx 컨테이너 내부로 실시간 동기화
-      - ./frontend/dist:/usr/share/nginx/html
+      - "3001:3001"
+
     restart: unless-stopped
-    networks:
-      - app-network
+
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+
+    container_name: nginx
+
     depends_on:
       - json-server
 
-  # 2. 가짜 백엔드 데이터 서버 (경로 완벽 교정본 ✨)
-  json-server:
-    container_name: mock-backend
-    image: node:20-alpine
-    working_dir: /data
     ports:
-      - "3001:3001"
-    volumes:
-      # 💡 핵심: 네 폴더 구조 그대로 frontend/server 안의 db.json을 정확하게 조준 마운트!
-      - ./frontend/server/db.json:/data/db.json
-    command: sh -c "npm install -g json-server@0.17.4 && json-server --watch db.json --port 3001 --host 0.0.0.0"
-    restart: unless-stopped
-    networks:
-      - app-network
+      - "80:80"
 
-networks:
-  app-network:
-    driver: bridge
+    restart: unless-stopped
