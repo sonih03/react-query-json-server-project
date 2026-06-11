@@ -12,8 +12,8 @@ import SiderBar from './components/layout/SiderBar'
 // import LoginPage from './no1_pages/user/LoginPage'
 import { useState } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import ProductPage from './no1_pages/sales/ProductPage'
-import SalesPage from './no1_pages/sales/SalesPage'
+import ProductPage from './pages/sales/ProductPage'
+import SalesPage from './pages/sales/SalesPage'
 import "ag-grid-community/styles/ag-grid.css"
 import "ag-grid-community/styles/ag-theme-alpine.css"
 import { ModuleRegistry, AlignedGridsModule, AllCommunityModule } from 'ag-grid-community'
