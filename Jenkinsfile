@@ -35,13 +35,13 @@ pipeline {
         }
 
         stage('3. 도커 컴포즈 인프라 배포 및 컨테이너 갱신') {
-            steps {
-                echo '⚡ Docker Compose 기반 컨테이너 완전 재빌드 및 배포 시동...'
-                sh 'docker compose down'
-                sh 'docker compose up -d --build'
-            }
-        }
-    }
+                    steps {
+                        echo '⚡ 캐시 찌꺼기 완전 소거 및 컴포즈 강제 재빌드 기동...'
+                        // 💡 --build와 --force-recreate를 주어 예전 우분투 캐시를 완전히 박살 냄!
+                        sh 'docker compose down'
+                        sh 'docker compose up -d --build --force-recreate'
+                    }
+                }
 
     post {
         success {
