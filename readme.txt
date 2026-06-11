@@ -1,3 +1,6 @@
+깃허브 토큰 비밀번호
+
+
 docker build -t custom-jenkins .
 
 ㅓ두

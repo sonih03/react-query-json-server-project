@@ -16,19 +16,18 @@ services:
     networks:
       - app-network
     depends_on:
-      - json-server # 💡 백엔드가 먼저 켜진 후 프론트엔드가 켜지도록 이성적 제어 구멍 확보
+      - json-server
 
-  # 2. 가짜 백엔드 데이터 서버 (JSON Server 추가 ✨)
+  # 2. 가짜 백엔드 데이터 서버 (경로 완벽 교정본 ✨)
   json-server:
     container_name: mock-backend
-    image: node:20-alpine # 무거운 이미지 대신 가벼운 노드 리눅스 채택
+    image: node:20-alpine
     working_dir: /data
     ports:
-      - "3001:3001" # 외부(호스트 컴퓨터 브라우저)에서도 3001포트로 확인 가능하게 매핑
+      - "3001:3001"
     volumes:
-      # 💡 중요: 루트에 있는 db.json 파일을 컨테이너 내부로 마운트
-      - ./db.json:/data/db.json
-    # 컨테이너 켜지자마자 json-server 글로벌 설치하고 3001 포트로 대기타게 만드는 알고리즘
+      # 💡 핵심: 네 폴더 구조 그대로 frontend/server 안의 db.json을 정확하게 조준 마운트!
+      - ./frontend/server/db.json:/data/db.json
     command: sh -c "npm install -g json-server@0.17.4 && json-server --watch db.json --port 3001 --host 0.0.0.0"
     restart: unless-stopped
     networks:

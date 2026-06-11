@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        // 프론트엔드 리액트 코드가 들어있는 하위 폴더 이름 설정
+        // 프론트엔드 소스 루트 폴더 설정
         FRONTEND_DIR = 'frontend'
     }
 
@@ -14,12 +14,21 @@ pipeline {
             }
         }
 
-        stage('2. 프론트엔드 라이브러리 설치 및 빌드') {
+        stage('2. 프론트엔드 라이브러리 강제 설치 및 빌드') {
             steps {
                 echo '🏗️ Node.js 기반 리액트 빌드 파이프라인 가동...'
-                // frontend 폴더 내부로 이동해서 노드 부품을 깔고 빌드 수행 (dist 생성)
                 dir("${env.FRONTEND_DIR}") {
+                    // 💡 [핵심 보안 제어 명령어]
+                    // 혹시나 남아있을지 모르는 낡은 부품 상자와 잠금 파일을 싹 강제로 밀어버림!
+                    echo '🧹 기존 낡은 부품 상자(node_modules) 및 캐시 완전 삭제 중...'
+                    sh 'rm -rf node_modules package-lock.json'
+
+                    // 의존성을 완전 생으로 깨끗하게 처음부터 다시 다운로드
+                    echo '📥 최신 노드 부품(Vite 포함) 무결점 강제 설치 중...'
                     sh 'npm install'
+
+                    // 부품 장착이 확실히 끝난 상태에서 안전하게 프로덕션 빌드 갱신
+                    echo '🚀 리액트 프로덕션 빌드 압축 가동 (Vite Build)...'
                     sh 'npm run build'
                 }
             }
@@ -28,8 +37,6 @@ pipeline {
         stage('3. 도커 컴포즈 인프라 배포 및 컨테이너 갱신') {
             steps {
                 echo '⚡ Docker Compose 기반 컨테이너 완전 재빌드 및 배포 시동...'
-                // 최상위 루트 경로에서 Nginx 설정 변경본과 db.json을 반영하여 컨테이너 리로드
-                // --build 옵션을 주어 nginx 설정 파일(nginx.conf) 변경사항을 100% 강제 반영
                 sh 'docker compose down'
                 sh 'docker compose up -d --build'
             }
@@ -39,15 +46,12 @@ pipeline {
     post {
         success {
             echo '======================================================='
-            echo '✨ [성공] Jenkins 파이프라인이 정석대로 무결점 배포를 완료했습니다!'
-            echo '🌐 프론트엔드(Nginx): http://localhost'
-            echo '🌐 가짜 백엔드(JSON Server): http://localhost:3001'
+            echo '✨ [성공] 젠킨스가 내부 명령어로 부품 싹 새로 깔고 배포 완수!'
             echo '======================================================='
         }
         failure {
             echo '======================================================='
-            echo '❌ [실패] 빌드 또는 배포 단계에서 인프라 락이 터졌습니다.'
-            echo '📝 젠킨스 Console Output 로그를 분석하여 권한이나 오타를 제어하세요.'
+            echo '❌ [실패] 빌드 파이프라인에 락이 걸렸습니다. 로그를 체크하세요.'
             echo '======================================================='
         }
     }
